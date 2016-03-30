@@ -1,0 +1,8 @@
+dist
+MANIFEST
+*.pyc
+*.pyo
+tmp*
+*tmp
+build
+

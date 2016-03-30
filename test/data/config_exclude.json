@@ -1,0 +1,8 @@
+{
+    "author": "Foo Bar",
+    "exclude": "*.py,dir*,*.hpp",
+    "license": "gpl3",
+    "program": "CoolApp",
+    "short": "This app makes everything cool.",
+    "year": "2016"
+}

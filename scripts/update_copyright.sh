@@ -1,0 +1,1 @@
+copyright -c copyright.json copyright/

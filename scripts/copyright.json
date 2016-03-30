@@ -1,0 +1,9 @@
+{
+    "author": "Remik Ziemlinski",
+    "back": true,
+    "license": "gpl3",
+    "program": "copyright",
+    "short": "copyright - Add or replace license boilerplate.",
+    "single": true,
+    "year": "2016"
+}
