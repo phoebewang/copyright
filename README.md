@@ -47,6 +47,3 @@ copyright Copyright (C) 2016 Remik Ziemlinski
 
 This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under the conditions of the GPLv3 license.
 
-## TODO
-- github
-- pypi

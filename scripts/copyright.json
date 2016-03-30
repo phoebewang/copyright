@@ -1,6 +1,7 @@
 {
     "author": "Remik Ziemlinski",
     "back": true,
+    "exclude": "template.py",
     "license": "gpl3",
     "program": "copyright",
     "short": "copyright - Add or replace license boilerplate.",

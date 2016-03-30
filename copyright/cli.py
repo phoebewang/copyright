@@ -12,19 +12,7 @@ class Cli:
         # Avoids python3 import hell.
         import copyright
 
-        desc = '''Add or update license/copyright boilerplate in files.'''
-        epilog = '''examples:
-
-# Process all known file types from this path.
-copyright -l gpl3 -a "Alice Doe, Joe Smith" -s "My cool app." -p CoolApp
-
-# Use options file.
-copyright -c options.json
-
-# Process specific files.
-copyright -c options.json file1 dir2/*
-        '''
-        parser = argparse.ArgumentParser(
+        desc =         epilog =         parser = argparse.ArgumentParser(
             add_help=True,
             description=desc,
             epilog=epilog,
@@ -93,6 +81,7 @@ copyright -c options.json file1 dir2/*
         parser.add_argument(
             '-y', '--year',
             help='''Year(s) to be injected into template. Defaults to current.''')
+
         parser.add_argument('files', help='List of files to process.')
 
         return parser
@@ -116,6 +105,20 @@ copyright -c options.json file1 dir2/*
 def demo():
     c = Cli()
     import sys
-    print(c.parse(sys.argv))
+    print(c.parse(sys.argv[1:]))
 
-#demo()
+# copyright - Add or replace license boilerplate.
+# Copyright (C) 2016 Remik Ziemlinski
+#
+# copyright is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# copyright is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
