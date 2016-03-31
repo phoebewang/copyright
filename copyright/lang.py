@@ -72,7 +72,7 @@ class Comments:
 
     @staticmethod
     def findCopyright(file=None, text=None, start='', stop='', single=None):
-                spans = Comments.find(file=file, text=text, start=start, stop=stop,
+        spans = Comments.find(file=file, text=text, start=start, stop=stop,
                               single=single, n=100000)
         if file:
             with open(file, 'r') as f:
@@ -147,7 +147,7 @@ class Lang(object):
         return ext or kw
 
     def strip(self, file=None, text=None):
-                spans = Comments.findCopyright(file=file, text=text, start=self.start,
+        spans = Comments.findCopyright(file=file, text=text, start=self.start,
                                        stop=self.stop, single=self.single)
         if not text:
             with open(file, 'r') as f:
@@ -227,16 +227,16 @@ class Detector:
 
 # copyright - Add or replace license boilerplate.
 # Copyright (C) 2016 Remik Ziemlinski
-# 
+#
 # copyright is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # copyright is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.

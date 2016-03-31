@@ -12,7 +12,19 @@ class Cli:
         # Avoids python3 import hell.
         import copyright
 
-        desc =         epilog =         parser = argparse.ArgumentParser(
+        desc = '''Add or update license/copyright boilerplate in files.'''
+        epilog = '''examples:
+
+# Process all known file types from this path.
+copyright -l gpl3 -a "Alice Doe, Joe Smith" -s "My cool app." -p CoolApp
+
+# Use options file.
+copyright -c options.json
+
+# Process specific files.
+copyright -c options.json file1 dir2/*
+        '''
+        parser = argparse.ArgumentParser(
             add_help=True,
             description=desc,
             epilog=epilog,
@@ -55,7 +67,7 @@ class Cli:
             action="store_true",
             help='Do not recurse into subdirectories.')
         parser.add_argument(
-            '-P', '--pad', type=int, default=1,
+            '-P', '--pad', type=int, default=4,
             help='Number of spaces to left-pad each line in license.')
         parser.add_argument(
             '-p', '--program',

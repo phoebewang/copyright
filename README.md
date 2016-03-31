@@ -3,6 +3,8 @@ Add or replace license/copyright boilerplate in source code files.
 
 All contiguous comment blocks (bounded by empty or code lines) that contain a copyright message are stripped before injecting the new message.
 
+You should commit all your code into a repo before running this program and check the results with a diff utility.
+
 ## Features
 * Autodetect language from extension or shebang or header.
 * Force programming language to use if files cannot be autodetected.
@@ -14,8 +16,8 @@ All contiguous comment blocks (bounded by empty or code lines) that contain a co
 * Append to file or insert after any contiguous header comment block.
 * Control left-hand margin padding and newline spacing.
 * JSON config file ingestion for repeated or automated use, overridden by command-line options.
-* Languages currently supported: C/C++, Java, HTML, Shell/Bash/Csh/Ksh/Tcsh/Zsh, Perl, Python, SQL, XML
 * Multi or single line comment style, such as /* */ vs. //.
+* Languages currently supported: C/C++, Java, HTML, Shell/Bash/Csh/Ksh/Tcsh/Zsh, Perl, Python, SQL, XML
 * Python 2 and 3.
 
 ## Examples
@@ -28,6 +30,10 @@ Process files matching wildcards, appending to end of file.
 
     $ copyright -a 'Joe Smith' -p MyApp -l mit -i '*.py,foo*.h,script?' --back
 
+Use custom template.
+
+    $ copyright -c config.json -t my_templates.json --license my-license-2.0
+
 ## Installation
 
 With PyPI.
@@ -37,6 +43,10 @@ With PyPI.
 With tarball.
 
     $ python setup.py install
+
+## Testing
+
+    $ make test
 
 ## FAQ
 Q1. How can you keep multiple licenses in a file?
