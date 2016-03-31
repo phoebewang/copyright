@@ -49,7 +49,7 @@ With tarball.
     $ make test
 
 ## FAQ
-Q1. How can you keep multiple licenses in a file?
+Q1. How can you keep multiple licenses in a file?<br>
 A1. One strategy is to create a custom templates file that has all the licenses merged into one key/value pair, and then process your specific list of files.
 
 ## License
