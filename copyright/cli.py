@@ -12,7 +12,9 @@ class Cli:
         # Avoids python3 import hell.
         import copyright
 
-        desc = '''Add or update license/copyright boilerplate in files.'''
+        desc = '''Add or update license/copyright boilerplate in files.
+version: {0}'''.format(copyright.version.__version__)
+
         epilog = '''examples:
 
 # Process all known file types from this path.
@@ -72,6 +74,10 @@ copyright -c options.json file1 dir2/*
         parser.add_argument(
             '-p', '--program',
             help='Program name to substitute into templates.')
+        parser.add_argument(
+            '-q', '--quiet',
+            action="store_true",
+            help='Do not print files processed.')
         parser.add_argument(
             '-r', '--regex',
             action="store_true",

@@ -17,6 +17,7 @@ You should commit all your code into a repo before running this program and chec
 * Control left-hand margin padding and newline spacing.
 * JSON config file ingestion for repeated or automated use, overridden by command-line options.
 * Multi or single line comment style, such as /* */ vs. //.
+* Quiet mode to suppress printing of altered files.
 * Languages currently supported: C/C++, Java, HTML, Shell/Bash/Csh/Ksh/Tcsh/Zsh, Perl, Python, SQL, XML
 * Python 2 and 3.
 
@@ -51,6 +52,15 @@ With tarball.
 ## FAQ
 Q1. How can you keep multiple licenses in a file?<br>
 A1. One strategy is to create a custom templates file that has all the licenses merged into one key/value pair, and then process your specific list of files.
+
+## News
+
+### 1.0.1.0
+* Added -q/--quiet mode.
+* Fixed -v/--version message.
+
+### 1.0.0.0
+* Initial release.
 
 ## License
 copyright Copyright (C) 2016 Remik Ziemlinski

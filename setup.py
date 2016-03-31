@@ -15,7 +15,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 setup(
     name='copyright',
     packages=['copyright'],
-    version='1.0.0.0',
+    version='1.0.1.0',
     description='Add or replace license boilerplate in source code files.',
     long_description=readmd('README.md'),
     author='Remik Ziemlinski',
@@ -23,5 +23,5 @@ setup(
     license='GPLv3',
     scripts=['scripts/copyright'],
     url='https://www.github.com/rsmz/copyright',
-    download_url='https://github.com/rsmz/copyright/archive/copyright-1.0.0.0.tar.gz',
+    download_url='https://github.com/rsmz/copyright/archive/copyright-1.0.1.0.tar.gz',
 )
