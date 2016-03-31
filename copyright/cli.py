@@ -89,7 +89,7 @@ copyright -c options.json file1 dir2/*
         parser.add_argument(
             '-v', '--version',
             action='version',
-            version='%(prog)s ' + copyright.version.__version__)
+            version='copyright ' + copyright.version.__version__)
         parser.add_argument(
             '-y', '--year',
             help='''Year(s) to be injected into template. Defaults to current.''')
