@@ -1,5 +1,6 @@
 import copyright
 import sys
+from colorama import init, Fore
 
 class App(object):
     '''
@@ -28,7 +29,7 @@ class App(object):
                 msg = 'Skipping unknown language: {0}\n'.format(file)
                 sys.stdout.write(msg)
             return
-        elif langtype == "bin":
+        elif langtype == "bin" or langtype == "ignore":
             self.result['binary'].append(['nneed', file])
             if self.config.debug:
                 msg = 'binary: {0}\n'.format(file)
@@ -62,13 +63,7 @@ class App(object):
             msg = '%s: %s\n' % (langtype, file)
             sys.stdout.write(msg)
 
-    def process(self, file):
-        langtype = self.config.lang or copyright.Detector.detect(file)
-        if not langtype:
-            msg = 'Skipping unknown language: {0}\n'.format(file)
-            sys.stdout.write(msg)
-            return
-
+    def process(self, file, langtype):
         text = copyright.License(self.config).text
         lang = self.langs[langtype]
         commented = lang.comment(text,
@@ -98,7 +93,6 @@ class App(object):
                 if self.config.debug:
                     copyright.logger.debug("file=" + file)
                 self.detect(file)
-        #sort_result = sorted(enumerate(self.result), key=lambda item: -item[0])
         for key, value in self.result.items():
             print '************************** %s **************************' % key
             for f in value:
@@ -106,27 +100,54 @@ class App(object):
             print
         print '************************** result[lang] **************************'
         for key, value in self.result.items():
-            print '%s\t%d' %(key, len(value))
+            if key in ['unknown', 'ignore']:
+                print Fore.YELLOW + '%s\t%d' %(key, len(value)) + Fore.WHITE
+            else:
+                print '%s\t%d' %(key, len(value))
         print '\n************************** result[license] **************************'
         lic_result = dict()
         for key, value in self.result.items():
             for f in value:
                 lic_result.setdefault(f[0], [])
                 lic_result[f[0]].append([key, f[1]])
+        cannot_write = False
         for key, value in lic_result.items():
-            print '%s\t%d' %(key, len(value))
+            if key in ['unknown', 'gpl3', 'gpl2', 'gpl', 'agpl3', 'lgpl3', 'lgpl2.1', 'lgpl2']:
+                cannot_write = True
+                print Fore.RED + '%s\t%d' %(key, len(value)) + Fore.WHITE
+            elif key in ['ndetect', 'apache2', 'apache1.1', 'apache1', 'mozilla1.1', 'mozilla2A', 'mozilla2B']:
+                print Fore.YELLOW + '%s\t%d' %(key, len(value)) + Fore.WHITE
+            elif key == 'none':
+                print Fore.GREEN + '%s\t%d' %(key, len(value)) + Fore.WHITE
+            else:
+                print '%s\t%d' %(key, len(value))
+        print
 
         if not self.config.write:
             return 0
-        for walk in walks:
-            for file in walk:
-                if self.config.debug:
-                    copyright.logger.debug("file=" + file)
-                self.process(file)
+
+        if cannot_write:
+            print Fore.RED + 'There are incompatible licenses in your floder'
+            print 'Please make sure the licenses are right or add the folder to exclude.' + Fore.WHITE
+            return 0
+        if None == lic_result.get('none'):
+            print 'All files are licensed'
+            return 0
+        lang_none = dict()
+        for i in lic_result['none']:
+            lang_none.setdefault(i[0], 0)
+            lang_none[i[0]] += 1
+        print '************************** Will write **************************'
+        for key, value in lang_none.items():
+            print '%s\t%d' %(key, value)
+        for file in lic_result['none']:
+            self.process(file[1], file[0])
+        print '\nFinish!'
         return 0
 
 def main():
     '''Run from commandline.'''
+    init()
     sys.exit(App.main(sys.argv[1:]))
 
 if '__main__' == __name__: main()

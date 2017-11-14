@@ -1,10 +1,9 @@
 {
-    "author": "Remik Ziemlinski",
-    "back": true,
-    "exclude": "cli.py,template.py",
-    "license": "gpl3",
-    "program": "copyright",
-    "short": "copyright - Add or replace license boilerplate.",
-    "single": true,
-    "year": "2016"
+    "author": "Phoebe Wang",
+    "back": false,
+    "exclude": "",
+    "license": "zxv1",
+    "program": "",
+    "short": "",
+    "single": false
 }
