@@ -1,6 +1,7 @@
 import copyright
 import os
 import re
+import string
 
 c = 'c h cpp hpp cxx c++'.split()
 java = 'java javascript js'.split()
@@ -8,6 +9,8 @@ py = ['py']
 sh = 'bash csh ksh pl sh tcsh zsh'.split()
 sql = 'sql psql tsql'.split()
 xml = 'htm html php xml'.split()
+ignore = 'txt bin'.split()
+makefile = 'mk'.split()
 
 extensions = {
     'c': c,
@@ -16,7 +19,9 @@ extensions = {
     'py': py,
     'sh': sh,
     'sql': sql,
-    'xml': xml
+    'xml': xml,
+    'ignore': ignore,
+    'makefile': makefile
 }
 
 class Comments:
@@ -58,7 +63,7 @@ class Comments:
         if start and stop:
             start = Comments.escape(start)
             stop = Comments.escape(stop)
-            pat = '{a}(.|[\r\n])*?{b}'.format(a=start, b=stop)
+            pat = '^\s*{a}(.|[\r\n])*?{b}'.format(a=start, b=stop)
             it = re.compile(pat, re.MULTILINE).finditer(text)
             nfound = 0
             for match in it:
@@ -80,6 +85,8 @@ class Comments:
         result = []
         for span in spans:
             if text[span[0]:span[1]].lower().count('copyright'):
+                result.append(span)
+            elif text[span[0]:span[1]].lower().count('license'):
                 result.append(span)
         return result
 
@@ -154,7 +161,7 @@ class Lang(object):
                 text = f.read()
 
         if not spans:
-            return text
+            return [text]
 
         result = []
         i,j = 0,0
@@ -168,7 +175,7 @@ class Lang(object):
         rem = text[i:j]
         result.append(rem)
 
-        return ''.join(result)
+        return [''.join(result), text, spans]
 
 
 class CLang(Lang):
@@ -203,6 +210,16 @@ class XmlLang(Lang):
         super(XmlLang, self).__init__('xml', extensions['xml'],
                 start='<!--', stop='-->', keywords=keywords)
 
+class Ignore(Lang):
+    def __init__(self):
+        super(Ignore, self).__init__('ignore', extensions['ignore'])
+
+class Makefile(Lang):
+    def __init__(self):
+        keywords = ['^\.PHONY\s*:', '^all\s*:\s*$', '^clean\s*:\s*$', '^TARGET\s*:', '^CFLAGS']
+        super(Makefile, self).__init__('makefile', extensions['makefile'], single='#',
+            keywords=keywords)
+
 def langs():
     return dict(
         c=CLang(),
@@ -210,14 +227,42 @@ def langs():
         py=PyLang(),
         sh=ShLang(),
         sql=SqlLang(),
-        xml=XmlLang())
+        xml=XmlLang(),
+        ignore=Ignore(),
+        make=Makefile())
 
 class Detector:
     langs = langs()
+    text_characters = "".join(map(chr, range(32, 127)) + list("\n\r\t\b"))
+    null_trans = string.maketrans("", "")
+
+    @staticmethod
+    def istext(filename):
+        if not filename or not os.path.exists(filename):
+            return False
+
+        with open(filename, 'r') as f:
+            s = f.read(512)
+
+            # Empty files are considered text
+            if not s:
+                return True
+
+            # Get the non-text characters (maps a character to itself then
+            # use the 'remove' option to get rid of the text characters.)
+            t = s.translate(Detector.null_trans, Detector.text_characters)
+
+            # If more than 30% non-text characters, then
+            # this is considered a binary file
+            if float(len(t)) / float(len(s)) > 0.30:
+                return False
+            return True
 
     @staticmethod
     def detect(filename):
         '''Return None or lang family name.'''
+        if not Detector.istext(filename):
+            return 'bin'
         names = list(Detector.langs.keys())
         names.sort()
         for name in names:

@@ -47,6 +47,10 @@ copyright -c options.json file1 dir2/*
             action="store_true",
             help='Print debug messages.')
         parser.add_argument(
+            '-w', '--write',
+            action="store_true",
+            help='Write new license to files.')
+        parser.add_argument(
             '-e', '--exclude',
             help='''Comma delimited list of name patterns to exclude.''')
         parser.add_argument(

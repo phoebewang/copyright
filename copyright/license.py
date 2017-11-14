@@ -19,7 +19,7 @@ class LicensedFile:
         if not self.file or not self.lic or not os.path.exists(self.file):
             return
 
-        text = self.lang.strip(file=self.file)
+        text = self.lang.strip(file=self.file)[0]
         sep = os.linesep * newlines
         if back:
             text = text.rstrip('\r\n') + sep + self.lic

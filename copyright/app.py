@@ -9,6 +9,7 @@ class App(object):
     def __init__(self):
         self.cli = copyright.Cli()
         self.config = copyright.Config()
+        self.result = dict(unknown = [], binary = [])
 
     @staticmethod
     def main(argv):
@@ -18,6 +19,48 @@ class App(object):
             return 'Failed to parse commandline.'
 
         return app.run()
+
+    def detect(self, file):
+        langtype = self.config.lang or copyright.Detector.detect(file)
+        if not langtype:
+            self.result['unknown'].append(['ndetect', file])
+            if self.config.debug:
+                msg = 'Skipping unknown language: {0}\n'.format(file)
+                sys.stdout.write(msg)
+            return
+        elif langtype == "bin":
+            self.result['binary'].append(['nneed', file])
+            if self.config.debug:
+                msg = 'binary: {0}\n'.format(file)
+                sys.stdout.write(msg)
+            return
+
+        lang = self.langs[langtype]
+        strip = lang.strip(file)
+        if len(strip) < 3:
+            self.result.setdefault(langtype, [])
+            self.result[langtype].append(['none', file])
+            if self.config.debug:
+                msg = 'none: {0}\n'.format(file)
+                sys.stdout.write(msg)
+            return
+        if len(strip[2]) > 1:
+            self.result.setdefault(langtype, [])
+            self.result[langtype].append(['more', file])
+            if self.config.debug:
+                msg = 'more: {0}\n'.format(file)
+                sys.stdout.write(msg)
+            return
+        text = strip[1][strip[2][0][0]:strip[2][0][1]]
+        text = unicode(text, errors='ignore')
+        if self.config.debug:
+            msg = '%s\n: %s\n' % (file, text)
+            sys.stdout.write(msg)
+        self.result.setdefault(langtype, [])
+        self.result[langtype].append([self.dist.license(text), file])
+        if self.config.debug:
+            msg = '%s: %s\n' % (langtype, file)
+            sys.stdout.write(msg)
 
     def process(self, file):
         langtype = self.config.lang or copyright.Detector.detect(file)
@@ -35,13 +78,13 @@ class App(object):
                                        lang,
                                        commented).write(back=self.config.back,
                                                         newlines=self.config.newlines)
-        if not self.config.quiet:
-            sys.stdout.write(file + '\n')
 
     def run(self):
         self.config.load(self.cli)
         if self.config.debug:
             copyright.logger.debug("config=" + repr(self.config))
+
+        self.dist = copyright.Dist(self.config.dict['templates'])
 
         self.langs = copyright.langs()
         walks = copyright.walks(self.config.files,
@@ -50,6 +93,31 @@ class App(object):
                                 regex=self.config.regex,
                                 recurse = not self.config.no_recurse,
                                 debug=self.config.debug)
+        for walk in walks:
+            for file in walk:
+                if self.config.debug:
+                    copyright.logger.debug("file=" + file)
+                self.detect(file)
+        #sort_result = sorted(enumerate(self.result), key=lambda item: -item[0])
+        for key, value in self.result.items():
+            print '************************** %s **************************' % key
+            for f in value:
+                print f
+            print
+        print '************************** result[lang] **************************'
+        for key, value in self.result.items():
+            print '%s\t%d' %(key, len(value))
+        print '\n************************** result[license] **************************'
+        lic_result = dict()
+        for key, value in self.result.items():
+            for f in value:
+                lic_result.setdefault(f[0], [])
+                lic_result[f[0]].append([key, f[1]])
+        for key, value in lic_result.items():
+            print '%s\t%d' %(key, len(value))
+
+        if not self.config.write:
+            return 0
         for walk in walks:
             for file in walk:
                 if self.config.debug:

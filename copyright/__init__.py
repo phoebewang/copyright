@@ -6,6 +6,7 @@ from .io import Walk, walks
 from .lang import CLang, Comments, Detector, extensions, JavaLang, langs, ShLang, SqlLang, XmlLang
 from .license import License
 from .log import logger
+from .dist import Dist
 from .template import Template
 from .version import __version__
 
