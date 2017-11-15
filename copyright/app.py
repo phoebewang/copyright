@@ -63,12 +63,15 @@ class App(object):
             msg = '%s: %s\n' % (langtype, file)
             sys.stdout.write(msg)
 
-    def process(self, file, langtype):
+    def process(self, file, langtype, clear = False):
         text = copyright.License(self.config).text
         lang = self.langs[langtype]
-        commented = lang.comment(text,
-                                 single=self.config.single,
-                                 pad=self.config.pad)
+        if clear:
+            commented = ''
+        else:
+            commented = lang.comment(text,
+                                     single=self.config.single,
+                                     pad=self.config.pad)
         copyright.license.LicensedFile(file,
                                        lang,
                                        commented).write(back=self.config.back,
@@ -123,25 +126,40 @@ class App(object):
                 print '%s\t%d' %(key, len(value))
         print
 
-        if not self.config.write:
+        if not (self.config.add or self.config.update or self.config.clr):
             return 0
 
         if cannot_write:
             print Fore.RED + 'There are incompatible licenses in your floder'
             print 'Please make sure the licenses are right or add the folder to exclude.' + Fore.WHITE
             return 0
-        if None == lic_result.get('none'):
-            print 'All files are licensed'
+        clr = False
+        if self.config.add:
+            lic = 'none'
+        if self.config.update:
+            lic = self.config.update
+        if self.config.clr:
+            clr = True
+            lic = self.config.clr
+        if lic in copyright.template.Template.DEFAULT.keys():
+            print Fore.RED + 'Default licenses cannot be clear or update' + Fore.WHITE
+            return 0
+        if None == lic_result.get(lic):
+            print 'Cannot find %s licensed file' % lic
             return 0
         lang_none = dict()
-        for i in lic_result['none']:
+        for i in lic_result[lic]:
             lang_none.setdefault(i[0], 0)
             lang_none[i[0]] += 1
         print '************************** Will write **************************'
         for key, value in lang_none.items():
             print '%s\t%d' %(key, value)
-        for file in lic_result['none']:
-            self.process(file[1], file[0])
+        content = raw_input("\nAre those file correct Yes/No: ")
+        if 'Yes' != content:
+            print '\nUser cancled'
+            return 0
+        for file in lic_result[lic]:
+            self.process(file[1], file[0], clr)
         print '\nFinish!'
         return 0
 

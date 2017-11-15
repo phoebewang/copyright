@@ -16,10 +16,14 @@ class LicensedFile:
 
     def write(self, back=False, newlines=1):
         '''Write text to file.'''
-        if not self.file or not self.lic or not os.path.exists(self.file):
+        if not self.file or not os.path.exists(self.file):
             return
 
-        text = self.lang.strip(file=self.file)[0]
+        text = self.lang.strip(file=self.file, newlines=newlines)[0]
+        if self.lic == '':
+            with open(self.file, 'w') as f:
+                f.write(text)
+            return
         sep = os.linesep * newlines
         if back:
             text = text.rstrip('\r\n') + sep + self.lic

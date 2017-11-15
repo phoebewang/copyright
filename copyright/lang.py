@@ -151,9 +151,9 @@ class Lang(object):
         '''Return True if file belongs to lang family.'''
         ext = self.hasext(filename)
         kw = self.haskeyword(filename)
-        return ext or kw
+        return ext and kw
 
-    def strip(self, file=None, text=None):
+    def strip(self, file=None, text=None, newlines=0):
         spans = Comments.findCopyright(file=file, text=text, start=self.start,
                                        stop=self.stop, single=self.single)
         if not text:
@@ -167,9 +167,30 @@ class Lang(object):
         i,j = 0,0
         for span in spans:
             j = span[0]
+            if len(text) <= span[1]+1:
+                for l in range(newlines):
+                    if j >= 2:
+                        if text[j-2:j] == '\r\n' or text[j-2:j] == '\n\r':
+                            j -= 2
+                    elif j >= 1:
+                        if text[j-1:j] == '\n':
+                            j -= 1
             sub = text[i:j]
             result.append(sub)
             i = span[1]+1
+            if len(text) > i:
+                for l in range(newlines):
+                    if len(text) - i >= 2:
+                        if text[i:i+2] == '\r\n' or text[i:i+2] == '\n\r':
+                            i += 2
+                            continue
+                    else:
+                        break
+                    if len(text) - i >= 1:
+                        if text[i:i+1] == '\n':
+                            i += 1
+                    else:
+                        break
 
         j = len(text)
         rem = text[i:j]
@@ -199,6 +220,9 @@ class ShLang(Lang):
         super(ShLang, self).__init__('sh', extensions['sh'], single='#',
             keywords=['#!.*sh.*', '#!.*perl.*', '^echo ', '^export ', '^set ', '^source ', '^# '])
 
+    def haskeyword(self, filename):
+        return True
+
 class SqlLang(Lang):
     def __init__(self):
         super(SqlLang, self).__init__('sql', extensions['sql'], single='--',
@@ -214,11 +238,20 @@ class Ignore(Lang):
     def __init__(self):
         super(Ignore, self).__init__('ignore', extensions['ignore'])
 
+    def haskeyword(self, filename):
+        return True
+
 class Makefile(Lang):
     def __init__(self):
         keywords = ['^\.PHONY\s*:', '^all\s*:\s*$', '^clean\s*:\s*$', '^TARGET\s*:', '^CFLAGS']
         super(Makefile, self).__init__('makefile', extensions['makefile'], single='#',
             keywords=keywords)
+
+    def hasext(self, file):
+        return Lang.hasext(self, file) or Lang.haskeyword(self, file)
+
+    def haskeyword(self, file):
+        return Lang.hasext(self, file) or Lang.haskeyword(self, file)
 
 def langs():
     return dict(
